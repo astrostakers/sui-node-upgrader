@@ -1,0 +1,6 @@
+
+sui_node_url: "https://sui-releases.s3-accelerate.amazonaws.com/388f54bff04e056a5785e914cdee176d6fae8fd0/sui-node"
+dest_path: /home/user/git/sui
+node_service_name: sui-node
+binary_source: /home/user/git/sui/sui-node
+binary_dest: /opt/sui/bin/sui-node

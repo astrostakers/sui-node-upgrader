@@ -1,0 +1,8 @@
+expected_checksum: 8ea60086a54804862e3e53389d918c5c9b0993ce
+branch_target: testnet-v1.20.0
+dest_path: /home/user/git/sui
+node_service_name: sui-node
+binary_source: /home/user/git/sui/target/release/sui-node
+binary_dest: /opt/sui/bin/sui-node
+script_source: compare.sh
+script_dest: ~/git/sui/compare.sh

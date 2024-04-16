@@ -1,0 +1,36 @@
+---
+ - hosts: all
+
+   vars_files:
+    - ./vars/vars-binary-update.yml
+     
+   tasks:
+   
+   - name: 1- downloading the binary for sui-node on "{{ sui_node_url }}"
+     ansible.builtin.get_url:
+       url: "{{ sui_node_url }}"
+       dest: "{{ dest_path }}"
+       mode: a+x
+
+      
+   - name: 2- Stop Node Service if running
+     become: true
+     ansible.builtin.systemd:
+       name: "{{ node_service_name }}"
+       state: stopped
+       
+   - name: 3- Copy binary
+     become: true
+     ansible.builtin.copy:
+       src: "{{ binary_source }}"
+       dest: "{{ binary_dest }}"
+       remote_src: true
+       force: yes
+       
+   - name: 4- Start Node Service
+     become: true
+     ansible.builtin.systemd:
+       name: "{{ node_service_name }}"
+       state: started
+       
+

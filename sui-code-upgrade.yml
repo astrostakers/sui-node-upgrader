@@ -1,0 +1,68 @@
+---
+ - hosts: all
+   
+   vars_files:
+    - ./vars/vars-code-upgrade.yml
+
+   tasks:
+
+   - name: 1- Delete sui directory directory
+     ansible.builtin.file: 
+      path: "{{ dest_path }}"
+      state: absent
+
+   - name: 2- Clone sui github repository for testnet branch
+     ansible.builtin.git:
+       repo: https://github.com/MystenLabs/sui.git
+       dest: "{{ dest_path }}"
+       version: "{{ branch_target }}"
+
+   - name: 3- Copy script
+     ansible.builtin.copy:
+       src: "{{ script_source }}"
+       dest: "{{ script_dest }}"
+       mode: a+x
+       force: yes
+
+   - name: 4- Compare the checksum
+     ansible.builtin.command: ~/git/sui/./compare.sh 'cd "{{ dest_path }}" && git rev-parse HEAD' "{{ expected_checksum }}"
+     register: compare
+   - debug: msg="{{ compare.stdout_lines }}"
+   
+  
+   - name: 5- Update sui-client
+     ansible.builtin.shell:
+      cmd: cargo build --bin sui --release
+      chdir: "{{ dest_path }}"
+     register: sui_client
+   - debug: msg="{{ sui_client.stderr_lines }}"
+   
+   
+   - name: 6- Update sui-node
+     ansible.builtin.shell:
+      cmd: cargo build --release --bin sui-node -j 48
+      chdir: "{{ dest_path }}"
+     register: sui_node
+   - debug: msg="{{ sui_node.stderr_lines }}"
+   
+   - name: 7- Stop Node Service if running
+     become: true
+     ansible.builtin.systemd:
+       name: "{{ node_service_name }}"
+       state: stopped
+       
+   - name: 8- Copy binary
+     become: true
+     ansible.builtin.copy:
+       src: "{{ binary_source }}"
+       dest: "{{ binary_dest }}"
+       remote_src: true
+       force: yes
+       
+   - name: 9- Start Node Service
+     become: true
+     ansible.builtin.systemd:
+       name: "{{ node_service_name }}"
+       state: started
+       
+
