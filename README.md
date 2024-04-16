@@ -49,6 +49,3 @@ For any issues or questions regarding this playbook, please open an issue in the
 
 Contributions to this playbook are welcome. Please fork the repository, make your changes, and submit a pull request.
 
-## License
-
-Specify the license under which this playbook is distributed.
