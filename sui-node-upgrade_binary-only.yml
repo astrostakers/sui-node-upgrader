@@ -5,7 +5,16 @@
     - ./vars/vars-binary-update.yml
      
    tasks:
-   
+   - name: Verify if "{{ binary_dest }}" exists
+     ansible.builtin.stat:
+       path: "{{ binary_dest }}"
+     register: directory_check
+
+   - name: Stop playbook if directory does not exist
+     ansible.builtin.fail:
+       msg: "Directory does not exist: {{ binary_dest }}"
+     when: directory_check.stat.exists == false
+
    - name: 1- downloading the binary for sui-node on "{{ sui_node_url }}"
      ansible.builtin.get_url:
        url: "{{ sui_node_url }}"
